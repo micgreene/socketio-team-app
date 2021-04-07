@@ -17,6 +17,14 @@ socket.on('message', (payload) => {
   console.log(chalk.green(`[${username}] ${text.split('\n')[0]}`))
 })
 
+socket.on('countdown', payload => {
+  console.log(payload)
+})
+
+socket.on('winner', payload => {
+  console.log(`${payload.username} WINS!!`)
+})
+
 repl.start({
   prompt: '> ',
   eval: (text) => {
