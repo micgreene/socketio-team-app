@@ -1,11 +1,11 @@
 'use strict';
 
 const io = require('socket.io-client');
-const host = 'http://bc8219463191.ngrok.io';
+const host = 'http://b86c1dbb8dd8.ngrok.io';
 const repl = require('repl');
 const chalk = require('chalk')
 const socket = io.connect(host);
-const username = 'Ryan'
+const username = 'MKG'
 
 socket.on('connect', () => {
   console.log('Connected to CHATROOM')
