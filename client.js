@@ -1,7 +1,7 @@
 'use strict';
 
 const io = require('socket.io-client');
-const host = 'http://localhost:3000';
+const host = 'http://7609a46ed838.ngrok.io';
 const repl = require('repl');
 const chalk = require('chalk')
 const socket = io.connect(host);
@@ -23,7 +23,7 @@ socket.on('message', (payload) => {
 })
 
 socket.on('countdown', payload => {
-  console.log(payload)
+  console.log(payload);
 })
 
 socket.on('wrong', payload => {
