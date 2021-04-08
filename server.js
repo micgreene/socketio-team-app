@@ -60,21 +60,26 @@ io.on('connection', (socket) => {
       startGame(socket, sentence);
     }
 
+    socket.broadcast.emit('message', payload)
+    socket.emit('message', payload)
     // winner
     if (payload.text.split('\n')[0] === players[payload.username].sentence) {
       // stop game and display winner
       winner.push('Someone won')
       if (winner.length === 1) {
+        // reset sentence
         sentence = sentences[Math.floor(Math.random() * sentences.length)]
         Object.keys(players).forEach(value => {
           players[value].sentence = sentence;
         })
+        // increment score
         players[payload.username].score++
         socket.broadcast.emit('round', payload)
         socket.emit('round', payload)
         if (players[payload.username].score === 3) {
           socket.broadcast.emit('winner', payload)
           socket.emit('winner', payload)
+          winner.pop()
         } else {
           // reset
           winner.pop()
@@ -82,9 +87,6 @@ io.on('connection', (socket) => {
         }
       }
     }
-
-    socket.broadcast.emit('message', payload)
-    socket.emit('message', payload)
   })
 })
 
@@ -95,6 +97,8 @@ function startGame(socket, sentence) {
     players[value].score = 0;
   })
 
+  socket.broadcast.emit('clear')
+  socket.emit('clear')
   setTimeout(() => {
     socket.broadcast.emit('countdown', '3')
     socket.emit('countdown', '3')
@@ -118,6 +122,11 @@ function startGame(socket, sentence) {
 }
 
 function nextQuestion(socket, sentence) {
+  setTimeout(() => {
+    socket.broadcast.emit('clear')
+    socket.emit('clear')
+  },3000)
+
   socket.broadcast.emit('countdown', '===========================')
   socket.broadcast.emit('countdown', 'GET READY FOR THE NEXT ROUND...')
   socket.broadcast.emit('countdown', '===========================')
@@ -127,15 +136,15 @@ function nextQuestion(socket, sentence) {
   setTimeout(() => {
     socket.broadcast.emit('countdown', '3')
     socket.emit('countdown', '3')
-  }, 2000)
+  }, 4000)
   setTimeout(() => {
     socket.broadcast.emit('countdown', '2')
     socket.emit('countdown', '2')
-  }, 3000)
+  }, 5000)
   setTimeout(() => {
     socket.broadcast.emit('countdown', '1')
     socket.emit('countdown', '1')
-  }, 4000)
+  }, 6000)
   setTimeout(() => {
     socket.broadcast.emit('countdown', '===========================')
     socket.broadcast.emit('countdown', sentence)
@@ -143,7 +152,7 @@ function nextQuestion(socket, sentence) {
     socket.emit('countdown', '===========================')
     socket.emit('countdown', sentence)
     socket.emit('countdown', '===========================')
-  }, 5000)
+  }, 7000)
 }
 
 console.log('SERVER UP AND RUNNING!!')
