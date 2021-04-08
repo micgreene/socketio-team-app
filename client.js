@@ -12,9 +12,11 @@ socket.on('connect', () => {
 socket.on('joined', payload => {
   console.log(`${payload} has entered the game!`)
 })
+
 socket.on('clear', payload => {
   process.stdout.write('\x1B[2J');
 })
+
 socket.on('message', (payload) => {
   // process.stdout.write('\x1B ')
   const text = payload.text;
