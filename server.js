@@ -17,71 +17,70 @@ const sentences = [
   `I thought I thought of thinking of thanking you`,
   `I wish to wash my Irish wristwatch`,
   `Fred fed Ted bread, and Ted fed Fred bread`,
-  `I slit the sheet, the sheet I slit, and on the slitted sheet I sit`,
+  `I fitted the sheet, the sheet I sheets, and on the fitted sheet I sit`,
   `A skunk sat on a stump and thunk the stump stunk, but the stump thunk the skunk stunk`,
   `Lesser leather never weathered wetter weather better`,
 ]
 
 const players = {
-    // fills in as users connect
+  // fills in as users connect
 };
+let winner = []
 
 
 
 io.on('connection', (socket) => {
   console.log(`${socket.id} HAS CONNECTED!`);
+
   socket.on('newPlayer', payload => {
     socket.broadcast.emit('joined', payload)
     socket.emit('joined', payload)
     // adds new player
     players[payload] = new Player(payload)
   })
+
   let sentence;
-  // let winner = null;
-  // let start = null;
+  // after pressing enter
   socket.on('message', payload => {
-
-
     // check player current players
     if (payload.text.split('\n')[0] === 'data') {
       console.log(players)
-      console.log(sentence)
+      console.log(`${sentence} SOCKETID: ${socket.id}`)
+      console.log(winner)
     }
 
     // start game
     if (payload.text.split('\n')[0] === 'start') {
-      // let winner = true;
       // start game with random sentence
       sentence = sentences[Math.floor(Math.random() * sentences.length)]
+      Object.keys(players).forEach(value => {
+        players[value].sentence = sentence;
+      })
+
       startGame(socket, sentence);
-      // start = true;
     }
 
-    // does not match sentence
-    // if (payload.text.split('\n')[0] !== sentence && start) {
-    //   socket.broadcast.emit('wrong', payload)
-    //   socket.emit('wrong', payload)
-    // }
-
     // winner
-    if (payload.text.split('\n')[0] === sentence) {
+    if (payload.text.split('\n')[0] === players[payload.username].sentence) {
       // stop game and display winner
-      let winner = true;
-      if (winner) {
+      winner.push('Someone won')
+      if (winner.length === 1) {
         sentence = sentences[Math.floor(Math.random() * sentences.length)]
-        // winner = payload.username;
+        Object.keys(players).forEach(value => {
+          players[value].sentence = sentence;
+        })
         players[payload.username].score++
         socket.broadcast.emit('round', payload)
         socket.emit('round', payload)
-      }
-      Object.keys(players).forEach(value => {
-        if (players[value].score === 3) {
+        if (players[payload.username].score === 3) {
           socket.broadcast.emit('winner', payload)
           socket.emit('winner', payload)
         } else {
+          // reset
+          winner.pop()
           nextQuestion(socket, sentence)
         }
-      })
+      }
     }
 
     socket.broadcast.emit('message', payload)
@@ -91,6 +90,11 @@ io.on('connection', (socket) => {
 
 // new player joins game
 function startGame(socket, sentence) {
+  // resets the scores
+  Object.keys(players).forEach(value => {
+    players[value].score = 0;
+  })
+
   setTimeout(() => {
     socket.broadcast.emit('countdown', '3')
     socket.emit('countdown', '3')
